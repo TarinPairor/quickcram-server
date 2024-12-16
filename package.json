@@ -1,6 +1,4 @@
 {
-  "name": "quickcram-server",
-  "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
@@ -10,7 +8,7 @@
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up",
     "docker:down": "docker-compose down",
-    "deploy": "vercel build && vercel --prod"
+    "deploy": "vercel --prod"
   },
   "keywords": [],
   "author": "",

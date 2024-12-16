@@ -1,5 +1,4 @@
-# node mod in any path
 node_modules
-# env
 .env
 .vercel
+.gitkeep
