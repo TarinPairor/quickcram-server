@@ -8,7 +8,7 @@
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up",
     "docker:down": "docker-compose down",
-    "deploy": "vercel --prod"
+    "deploy": "npm run build && vercel --prod"
   },
   "keywords": [],
   "author": "",

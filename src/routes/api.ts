@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-const router = require("express").Router();
+import { Router, Request, Response, NextFunction } from "express";
+
+const router = Router();
 
 router.get("/", (req: Request, res: Response) => {
   res.send("Api Route Working");
@@ -17,4 +18,4 @@ router.post(
   }
 );
 
-module.exports = router;
+export default router;
