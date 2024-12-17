@@ -9,15 +9,26 @@ import cors from "cors";
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
+// Use CORS middleware
 app.use(
   cors({
-    origin: "*",
+    origin: "*", // Allow all origins
     methods: "GET,POST,PUT,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization",
+    allowedHeaders: "Content-Type,Authorization,vercel-automatic-bypass-secret",
   })
 );
+
+// Middleware to check for the secret
+app.use((req: Request, res: Response, next: NextFunction): void => {
+  const secret = req.headers["vercel-automatic-bypass-secret"];
+  if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+  next();
+});
 
 // Use morgan for logging
 app.use(morgan("dev"));
