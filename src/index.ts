@@ -3,11 +3,14 @@ import dotenv from "dotenv";
 import createError from "http-errors";
 import morgan from "morgan";
 import apiRouter from "./routes/api";
+import cors from "cors";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors());
 
 // Use morgan for logging
 app.use(morgan("dev"));
@@ -19,7 +22,7 @@ app.use(express.json());
 app.use("/api", apiRouter);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.json({ message: "Express + TypeScript Server" });
 });
 
 // Catch 404 and forward to error handler

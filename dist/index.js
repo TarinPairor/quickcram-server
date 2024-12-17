@@ -8,9 +8,11 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const http_errors_1 = __importDefault(require("http-errors"));
 const morgan_1 = __importDefault(require("morgan"));
 const api_1 = __importDefault(require("./routes/api"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
+app.use((0, cors_1.default)());
 // Use morgan for logging
 app.use((0, morgan_1.default)("dev"));
 // Parse JSON bodies
@@ -18,7 +20,7 @@ app.use(express_1.default.json());
 // Use API routes
 app.use("/api", api_1.default);
 app.get("/", (req, res) => {
-    res.send("Express + TypeScript Server");
+    res.json({ message: "Express + TypeScript Server" });
 });
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
