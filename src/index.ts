@@ -14,21 +14,24 @@ const port = process.env.PORT || 4000;
 // Use CORS middleware
 app.use(
   cors({
-    origin: "*", // Allow all origins
+    origin: [
+      process.env.VITE_FRONTEND_URL || "",
+      process.env.PUBLIC_FRONTEND_URL || "",
+    ],
     methods: "GET,POST,PUT,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization,vercel-automatic-bypass-secret",
+    allowedHeaders: "Content-Type,Authorization",
   })
 );
 
-// Middleware to check for the secret
-app.use((req: Request, res: Response, next: NextFunction): void => {
-  const secret = req.headers["vercel-automatic-bypass-secret"];
-  if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
-  next();
-});
+// // Middleware to check for the secret
+// app.use((req: Request, res: Response, next: NextFunction): void => {
+//   const secret = req.headers["vercel-automatic-bypass-secret"];
+//   if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
+//     res.status(401).json({ message: "Unauthorized" });
+//     return;
+//   }
+//   next();
+// });
 
 // Use morgan for logging
 app.use(morgan("dev"));

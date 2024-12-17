@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// filepath: /Users/tarinpairor/Library/Mobile Documents/com~apple~CloudDocs/Documents/GitHub/quickcram-ai/quickcram-server/src/index.ts
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const http_errors_1 = __importDefault(require("http-errors"));
@@ -14,19 +15,19 @@ const app = (0, express_1.default)();
 const port = process.env.PORT || 4000;
 // Use CORS middleware
 app.use((0, cors_1.default)({
-    origin: "*", // Allow all origins
+    origin: "*",
     methods: "GET,POST,PUT,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization,vercel-automatic-bypass-secret",
+    allowedHeaders: "Content-Type,Authorization",
 }));
-// Middleware to check for the secret
-app.use((req, res, next) => {
-    const secret = req.headers["vercel-automatic-bypass-secret"];
-    if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
-    next();
-});
+// // Middleware to check for the secret
+// app.use((req: Request, res: Response, next: NextFunction): void => {
+//   const secret = req.headers["vercel-automatic-bypass-secret"];
+//   if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
+//     res.status(401).json({ message: "Unauthorized" });
+//     return;
+//   }
+//   next();
+// });
 // Use morgan for logging
 app.use((0, morgan_1.default)("dev"));
 // Parse JSON bodies
