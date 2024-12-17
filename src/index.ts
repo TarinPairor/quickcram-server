@@ -1,3 +1,4 @@
+// filepath: /Users/tarinpairor/Library/Mobile Documents/com~apple~CloudDocs/Documents/GitHub/quickcram-ai/quickcram-server/src/index.ts
 import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import createError from "http-errors";
@@ -12,7 +13,7 @@ const port = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173/",
+    origin: "*",
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
   })
