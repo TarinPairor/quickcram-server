@@ -1,5 +1,12 @@
 import { Router, Request, Response, NextFunction } from "express";
 import fetch from "node-fetch";
+import { google } from "googleapis";
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "http://localhost:5173"
+);
 
 const router = Router();
 
@@ -9,12 +16,25 @@ router.get("/", (req: Request, res: Response) => {
 
 router.post(
   "/create-tokens",
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const { code } = req.body;
-      res.send(code);
+      if (!code) {
+        return res.status(400).json({ error: "Missing code" });
+      }
+      // console.log("Received authorization code:", code);
+
+      // const { tokens } = await oauth2Client.getToken({
+      //   code,
+      //   redirect_uri: "http://localhost:5173",
+      // });
+
+      // console.log("Tokens:", tokens);
+      // res.json(tokens);
+      res.json({ code });
     } catch (error) {
-      next(error);
+      console.error("Error exchanging code for tokens:", error);
+      res.status(500).json({ error: "Error exchanging code for tokens" });
     }
   }
 );
