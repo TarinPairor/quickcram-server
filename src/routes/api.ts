@@ -1,10 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import fetch from "node-fetch";
 import { google } from "googleapis";
-import dotenv from "dotenv";
-import { existsSync } from "fs";
-
-dotenv.config();
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -27,31 +23,31 @@ router.get("/", (req: Request, res: Response) => {
   res.send("Api Route Working");
 });
 
-router.post(
-  "/verify-token",
-  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    try {
-      const { credential } = req.body;
-      if (!credential) {
-        return res.status(400).json({ error: "Missing credential" });
-      }
-      console.log("Received credential:", credential);
+// router.post(
+//   "/verify-token",
+//   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+//     try {
+//       const { credential } = req.body;
+//       if (!credential) {
+//         return res.status(400).json({ error: "Missing credential" });
+//       }
+//       console.log("Received credential:", credential);
 
-      const ticket = await oauth2Client.verifyIdToken({
-        idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
+//       const ticket = await oauth2Client.verifyIdToken({
+//         idToken: credential,
+//         audience: process.env.GOOGLE_CLIENT_ID,
+//       });
 
-      const payload = ticket.getPayload();
-      console.log("Payload:", payload);
+//       const payload = ticket.getPayload();
+//       console.log("Payload:", payload);
 
-      res.json({ payload });
-    } catch (error) {
-      console.error("Error verifying token:", error);
-      res.status(500).json({ error: "Error verifying token" });
-    }
-  }
-);
+//       res.json({ payload });
+//     } catch (error) {
+//       // console.error("Error verifying token:", error);
+//       res.status(500).json({ error: "Error verifying token" });
+//     }
+//   }
+// );
 
 router.post(
   "/create-tokens",
@@ -144,49 +140,116 @@ router.post(
 );
 
 router.post("/chatgpt", async (req: Request, res: Response) => {
+  const { prompt } = req.body;
   const apiKey = process.env.OPENAI_API_KEY;
   const url = "https://api.openai.com/v1/chat/completions";
   const APIBody = {
-    model: "gpt-4o-2024-08-06",
+    model: "gpt-4o-2024-08-06", // or "gpt-4-turbo-preview" if you want the latest version
     messages: [
       {
         role: "system",
         content:
-          "You are a helpful math tutor. Guide the user through the solution step by step.",
+          "You are a helpful assistant. Create a Google Calendar event based on the user's input.",
       },
       {
         role: "user",
-        content: "how can I solve 8x + 7 = -23",
+        content: prompt,
       },
     ],
     response_format: {
       type: "json_schema",
       json_schema: {
-        name: "math_reasoning",
+        name: "google_calendar_event",
+        strict: false,
         schema: {
           type: "object",
           properties: {
-            steps: {
+            summary: {
+              type: "string",
+            },
+            description: {
+              type: "string",
+            },
+            location: {
+              type: "string",
+            },
+            start: {
               type: "array",
               items: {
                 type: "object",
                 properties: {
-                  explanation: { type: "string" },
-                  output: { type: "string" },
+                  dateTime: {
+                    type: "string",
+                  },
                 },
-                required: ["explanation", "output"],
+                required: ["dateTime"],
                 additionalProperties: false,
               },
             },
-            final_answer: { type: "string" },
+            end: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  dateTime: {
+                    type: "string",
+                  },
+                },
+                required: ["dateTime"],
+                additionalProperties: false,
+              },
+            },
           },
-          required: ["steps", "final_answer"],
           additionalProperties: false,
+          required: ["summary", "start", "end"],
         },
-        strict: true,
       },
     },
   };
+
+  // response_format: {
+  //   type: "json_schema",
+  //   json_schema: {
+  //     name: "calendar_event",
+  //     schema: {
+  //       type: "object",
+  //       properties: {
+  //         summary: { type: "string" },
+  //         description: { type: "string" },
+  //         location: { type: "string" },
+  //         start: {
+  //           type: "array",
+  //           items: {
+  //             type: "object",
+  //             properties: {
+  //               // explanation: { type: "string" },
+  //               // output: { type: "string" },
+  //               dateTime: { type: "string" },
+  //             },
+  //             required: ["dateTime"],
+  //             additionalProperties: false,
+  //           },
+  //         },
+  //         end: {
+  //           type: "array",
+  //           items: {
+  //             type: "object",
+  //             properties: {
+  //               // explanation: { type: "string" },
+  //               // output: { type: "string" },
+  //               dateTime: { type: "string" },
+  //             },
+  //             required: ["dateTime"],
+  //             additionalProperties: false,
+  //           },
+  //         },
+  //       },
+  //       required: ["summary", "start", "end"],
+  //       additionalProperties: false,
+  //     },
+  //     strict: true,
+  //   },
+  // },
 
   try {
     const response = await fetch(url, {
@@ -199,6 +262,8 @@ router.post("/chatgpt", async (req: Request, res: Response) => {
     });
 
     if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenAI API Error:", errorData);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
