@@ -1,11 +1,24 @@
 import { Router, Request, Response, NextFunction } from "express";
 import fetch from "node-fetch";
 import { google } from "googleapis";
+import dotenv from "dotenv";
+import { existsSync } from "fs";
+
+dotenv.config();
+
+const clientId = process.env.GOOGLE_CLIENT_ID;
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const redirectUri = "http://localhost:5173/auth/callback";
+
+console.log("Checking OAuth configuration:");
+console.log("Client ID exists:", !!clientId);
+console.log("Client Secret exists:", !!clientSecret);
+console.log("Redirect URI:", redirectUri);
 
 const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  "http://localhost:5173/auth/callback"
+  clientId,
+  clientSecret,
+  redirectUri
 );
 
 const router = Router();
@@ -13,6 +26,32 @@ const router = Router();
 router.get("/", (req: Request, res: Response) => {
   res.send("Api Route Working");
 });
+
+router.post(
+  "/verify-token",
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const { credential } = req.body;
+      if (!credential) {
+        return res.status(400).json({ error: "Missing credential" });
+      }
+      console.log("Received credential:", credential);
+
+      const ticket = await oauth2Client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      console.log("Payload:", payload);
+
+      res.json({ payload });
+    } catch (error) {
+      console.error("Error verifying token:", error);
+      res.status(500).json({ error: "Error verifying token" });
+    }
+  }
+);
 
 router.post(
   "/create-tokens",
@@ -24,16 +63,82 @@ router.post(
       }
       console.log("Received authorization code:", code);
 
-      const { tokens } = await oauth2Client.getToken({
-        code,
-        redirect_uri: "http://localhost:5173/auth/callback",
+      // Log the OAuth client configuration
+      console.log("OAuth Client Config:", {
+        clientId: oauth2Client._clientId,
+        // redirectUri: oauth2Client.redirectUri,
+        hasSecret: !!oauth2Client._clientSecret,
       });
 
-      console.log("Tokens:", tokens);
-      res.json(tokens);
+      const tokenResponse = await oauth2Client.getToken({
+        code: code,
+        redirect_uri: redirectUri,
+      });
+
+      console.log("Token response received:", !!tokenResponse);
+
+      if (!tokenResponse.tokens) {
+        throw new Error("No tokens received in response");
+      }
+
+      oauth2Client.setCredentials(tokenResponse.tokens);
+
+      res.json(tokenResponse.tokens);
+    } catch (error: any) {
+      console.error("Detailed error:", {
+        message: error.message,
+        response: error.response?.data,
+        config: {
+          clientId: !!oauth2Client._clientId,
+          // redirectUri: oauth2Client._redirectUri,
+        },
+      });
+      res.status(500).json({
+        error: "Error exchanging code for tokens",
+        details: error.response?.data || error.message,
+      });
+    }
+  }
+);
+
+router.post(
+  "/create-calendar-event",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // const { event } = req.body;
+      // if (!event) {
+      //   return res.status(400).json({ error: "Missing event" });
+      // }
+
+      // Log the OAuth client crendentials ie if it has accesstoken and refresh token
+      console.log("OAuth Client Config:", {
+        hasAccessToken: !!oauth2Client.credentials.access_token,
+        hasRefreshToken: !!oauth2Client.credentials.refresh_token,
+      });
+
+      const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+
+      const result = await calendar.events.insert({
+        calendarId: "primary",
+        requestBody: {
+          summary: "Test Event",
+          description: "This is a test event",
+          start: {
+            //now in Singapore
+            dateTime: new Date().toISOString(),
+            timeZone: "Asia/Singapore",
+          },
+          end: {
+            dateTime: new Date().toISOString(),
+            timeZone: "Asia/Singapore",
+          },
+        },
+      });
+
+      res.json(result.data);
     } catch (error) {
-      console.error("Error exchanging code for tokens:", error);
-      res.status(500).json({ error: "Error exchanging code for tokens" });
+      next(error);
+      console.error("Error creating calendar event:", error);
     }
   }
 );

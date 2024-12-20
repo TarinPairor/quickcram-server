@@ -11,6 +11,17 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 4000;
 
+// Middleware to set COOP and COEP headers
+app.use((req, res: Response, next: NextFunction) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  res.setHeader(
+    "Content-Security-Policy",
+    "script-src 'self' https://accounts.google.com https://apis.google.com"
+  );
+  next();
+});
+
 // Use CORS middleware
 app.use(
   cors({
