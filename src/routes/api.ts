@@ -1,6 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import fetch from "node-fetch";
 import { google } from "googleapis";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -99,14 +102,17 @@ router.post(
 
 router.post(
   "/create-calendar-event",
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-      // const { event } = req.body;
-      // if (!event) {
-      //   return res.status(400).json({ error: "Missing event" });
-      // }
+      const { event } = req.body;
+      if (!event) {
+        return res.status(400).json({ error: "Missing event" });
+      }
 
-      // Log the OAuth client crendentials ie if it has accesstoken and refresh token
+      // Destructure the event object
+      const { summary, description, location, start, end } = event;
+
+      // Log the OAuth client credentials
       console.log("OAuth Client Config:", {
         hasAccessToken: !!oauth2Client.credentials.access_token,
         hasRefreshToken: !!oauth2Client.credentials.refresh_token,
@@ -117,15 +123,16 @@ router.post(
       const result = await calendar.events.insert({
         calendarId: "primary",
         requestBody: {
-          summary: "Test Event",
-          description: "This is a test event",
+          summary,
+          description,
+          location,
           start: {
-            //now in Singapore
-            dateTime: new Date().toISOString(),
-            timeZone: "Asia/Singapore",
+            // just do start = event.start
+            dateTime: start[0].dateTime,
+            timeZone: "Asia/Singapore", //NOTE: This is hardcoded for now
           },
           end: {
-            dateTime: new Date().toISOString(),
+            dateTime: end[0].dateTime,
             timeZone: "Asia/Singapore",
           },
         },
@@ -133,8 +140,10 @@ router.post(
 
       res.json(result.data);
     } catch (error) {
-      next(error);
       console.error("Error creating calendar event:", error);
+      res.status(500).json({
+        error: "Error creating calendar event",
+      });
     }
   }
 );
@@ -148,8 +157,13 @@ router.post("/chatgpt", async (req: Request, res: Response) => {
     messages: [
       {
         role: "system",
-        content:
-          "You are a helpful assistant. Create a Google Calendar event based on the user's input.",
+        content: `You are a helpful assistant. Create a Google Calendar event based on the user's input.
+          Remember that the current date is ${new Date().toDateString()} and the time is ${new Date().toLocaleTimeString()}.
+          Also note that the description should be descriptive, non-opinionated, and concise. Also note that the location 
+          should be specific and accurate. Additionally, notice that there are required fields for the event: summary, start, and end.
+          For now if the start and end are not provided just asume it's in 30 minutes from now. Also for the location, and descriptions 
+          are not provided, just leave them empty.
+          `,
       },
       {
         role: "user",
