@@ -5,7 +5,7 @@ import { google } from "googleapis";
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  "http://localhost:5173"
+  "http://localhost:5173/auth/callback"
 );
 
 const router = Router();
@@ -22,16 +22,15 @@ router.post(
       if (!code) {
         return res.status(400).json({ error: "Missing code" });
       }
-      // console.log("Received authorization code:", code);
+      console.log("Received authorization code:", code);
 
-      // const { tokens } = await oauth2Client.getToken({
-      //   code,
-      //   redirect_uri: "http://localhost:5173",
-      // });
+      const { tokens } = await oauth2Client.getToken({
+        code,
+        redirect_uri: "http://localhost:5173/auth/callback",
+      });
 
-      // console.log("Tokens:", tokens);
-      // res.json(tokens);
-      res.json({ code });
+      console.log("Tokens:", tokens);
+      res.json(tokens);
     } catch (error) {
       console.error("Error exchanging code for tokens:", error);
       res.status(500).json({ error: "Error exchanging code for tokens" });
