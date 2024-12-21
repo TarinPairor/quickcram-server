@@ -157,13 +157,20 @@ router.post("/chatgpt", async (req: Request, res: Response) => {
     messages: [
       {
         role: "system",
-        content: `You are a helpful assistant. Create a Google Calendar event based on the user's input.
-          Remember that the current date is ${new Date().toDateString()} and the time is ${new Date().toLocaleTimeString()}.
-          Also note that the description should be descriptive, non-opinionated, and concise. Also note that the location 
-          should be specific and accurate. Additionally, notice that there are required fields for the event: summary, start, and end.
-          For now if the start and end are not provided just asume it's in 30 minutes from now. Also for the location, and descriptions 
-          are not provided, just leave them empty.
-          `,
+        content: `
+        You are a helpful assistant tasked with creating Google Calendar events based on user inputs.
+        ### Details:
+        - Current date: ${new Date().toDateString()}
+        - Current time: ${new Date().toLocaleTimeString()}
+        - Required fields: summary, start, end.
+        - Defaults:
+          - If no times are provided, assume the event starts in 1 hour and lasts 30 minutes.
+          - If only start is given, assume it lasts 30 minutes.
+          - If only end is given, assume it starts 30 minutes prior.
+          - Leave location and description empty if not provided.
+        - Description: Be concise, descriptive, and neutral.
+        - Location: Use accurate and specific details if provided.
+      `,
       },
       {
         role: "user",
