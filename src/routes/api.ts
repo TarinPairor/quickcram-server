@@ -129,11 +129,11 @@ router.post(
           start: {
             // just do start = event.start
             dateTime: start[0].dateTime,
-            timeZone: "Asia/Singapore", //NOTE: This is hardcoded for now
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
           end: {
             dateTime: end[0].dateTime,
-            timeZone: "Asia/Singapore",
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         },
       });
