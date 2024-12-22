@@ -52,6 +52,8 @@ router.get("/", (req: Request, res: Response) => {
 //   }
 // );
 
+/* This specific route in the code is responsible for exchanging an authorization code for access and
+refresh tokens using the OAuth2 client credentials. */
 router.post(
   "/create-tokens",
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -100,6 +102,8 @@ router.post(
   }
 );
 
+/* This specific route in the code is responsible for creating a new calendar event using the Google
+Calendar API. */
 router.post(
   "/create-calendar-event",
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -148,12 +152,15 @@ router.post(
   }
 );
 
+/* This specific route in the code is responsible for interacting with the OpenAI API, specifically
+the ChatGPT model, to generate responses based on user prompts related to creating Google Calendar
+events. */
 router.post("/chatgpt", async (req: Request, res: Response) => {
   const { prompt } = req.body;
   const apiKey = process.env.OPENAI_API_KEY;
   const url = "https://api.openai.com/v1/chat/completions";
   const APIBody = {
-    model: "gpt-4o-2024-08-06", // or "gpt-4-turbo-preview" if you want the latest version
+    model: "gpt-4o-2024-08-06",
     messages: [
       {
         role: "system",
@@ -227,50 +234,6 @@ router.post("/chatgpt", async (req: Request, res: Response) => {
       },
     },
   };
-
-  // response_format: {
-  //   type: "json_schema",
-  //   json_schema: {
-  //     name: "calendar_event",
-  //     schema: {
-  //       type: "object",
-  //       properties: {
-  //         summary: { type: "string" },
-  //         description: { type: "string" },
-  //         location: { type: "string" },
-  //         start: {
-  //           type: "array",
-  //           items: {
-  //             type: "object",
-  //             properties: {
-  //               // explanation: { type: "string" },
-  //               // output: { type: "string" },
-  //               dateTime: { type: "string" },
-  //             },
-  //             required: ["dateTime"],
-  //             additionalProperties: false,
-  //           },
-  //         },
-  //         end: {
-  //           type: "array",
-  //           items: {
-  //             type: "object",
-  //             properties: {
-  //               // explanation: { type: "string" },
-  //               // output: { type: "string" },
-  //               dateTime: { type: "string" },
-  //             },
-  //             required: ["dateTime"],
-  //             additionalProperties: false,
-  //           },
-  //         },
-  //       },
-  //       required: ["summary", "start", "end"],
-  //       additionalProperties: false,
-  //     },
-  //     strict: true,
-  //   },
-  // },
 
   try {
     const response = await fetch(url, {
