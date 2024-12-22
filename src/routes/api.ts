@@ -7,7 +7,7 @@ dotenv.config();
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const redirectUri = "http://localhost:5173/auth/callback";
+const redirectUri = process.env.REDIRECT_URI;
 
 console.log("Checking OAuth configuration:");
 console.log("Client ID exists:", !!clientId);
