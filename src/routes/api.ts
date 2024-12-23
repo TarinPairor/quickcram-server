@@ -26,31 +26,31 @@ router.get("/", (req: Request, res: Response) => {
   res.send("Api Route Working");
 });
 
-// router.post(
-//   "/verify-token",
-//   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-//     try {
-//       const { credential } = req.body;
-//       if (!credential) {
-//         return res.status(400).json({ error: "Missing credential" });
-//       }
-//       console.log("Received credential:", credential);
+router.post(
+  "/verify-credential",
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const { credential } = req.body;
+      if (!credential) {
+        return res.status(400).json({ error: "Missing credential" });
+      }
+      console.log("Received credential:", credential);
 
-//       const ticket = await oauth2Client.verifyIdToken({
-//         idToken: credential,
-//         audience: process.env.GOOGLE_CLIENT_ID,
-//       });
+      const ticket = await oauth2Client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
 
-//       const payload = ticket.getPayload();
-//       console.log("Payload:", payload);
+      const payload = ticket.getPayload();
+      console.log("Payload:", payload);
 
-//       res.json({ payload });
-//     } catch (error) {
-//       // console.error("Error verifying token:", error);
-//       res.status(500).json({ error: "Error verifying token" });
-//     }
-//   }
-// );
+      res.json({ payload });
+    } catch (error) {
+      // console.error("Error verifying token:", error);
+      res.status(500).json({ error: "Error verifying token" });
+    }
+  }
+);
 
 /* This specific route in the code is responsible for exchanging an authorization code for access and
 refresh tokens using the OAuth2 client credentials. */
