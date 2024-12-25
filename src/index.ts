@@ -34,16 +34,6 @@ app.use(
   })
 );
 
-// // Middleware to check for the secret
-// app.use((req: Request, res: Response, next: NextFunction): void => {
-//   const secret = req.headers["vercel-automatic-bypass-secret"];
-//   if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
-//     res.status(401).json({ message: "Unauthorized" });
-//     return;
-//   }
-//   next();
-// });
-
 // Use morgan for logging
 app.use(morgan("dev"));
 
