@@ -139,11 +139,12 @@ router.post(
           start: {
             // just do start = event.start
             dateTime: start[0].dateTime,
-            timeZone: start[0].timeZone,
+            // Singapore timezone
+            timeZone: "Asia/Singapore",
           },
           end: {
             dateTime: end[0].dateTime,
-            timeZone: end[0].timeZone,
+            timeZone: "Asia/Singapore",
           },
         },
       });
