@@ -13,21 +13,22 @@ const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 4000;
+// Middleware to set COOP and COEP headers
+app.use((req, res, next) => {
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+    res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+    res.setHeader("Content-Security-Policy", "script-src 'self' https://accounts.google.com https://apis.google.com");
+    next();
+});
 // Use CORS middleware
 app.use((0, cors_1.default)({
-    origin: "*",
+    origin: [
+        process.env.VITE_FRONTEND_URL || "",
+        process.env.PUBLIC_FRONTEND_URL || "",
+    ],
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
 }));
-// // Middleware to check for the secret
-// app.use((req: Request, res: Response, next: NextFunction): void => {
-//   const secret = req.headers["vercel-automatic-bypass-secret"];
-//   if (secret !== process.env.VERCEL_AUTOMATIC_BYPASS_SECRET) {
-//     res.status(401).json({ message: "Unauthorized" });
-//     return;
-//   }
-//   next();
-// });
 // Use morgan for logging
 app.use((0, morgan_1.default)("dev"));
 // Parse JSON bodies

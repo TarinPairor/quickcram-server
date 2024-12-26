@@ -27,6 +27,10 @@ router.get("/", (req: Request, res: Response) => {
   res.send("Api Route Working");
 });
 
+router.get("/sub", (req: Request, res: Response) => {
+  res.send("Sub Route Working");
+});
+
 router.post(
   "/verify-credential",
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -159,6 +163,8 @@ events. */
 router.post("/chatgpt", async (req: Request, res: Response) => {
   const { prompt } = req.body;
   const apiKey = process.env.OPENAI_API_KEY;
+  console.log("Received prompt:", prompt);
+  console.log("API Key exists:", !!apiKey);
   const url = "https://api.openai.com/v1/chat/completions";
   const APIBody = {
     model: "gpt-4o-2024-08-06",
