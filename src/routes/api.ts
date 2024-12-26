@@ -47,7 +47,8 @@ router.post(
       });
 
       const payload = ticket.getPayload();
-      console.log("Payload:", payload);
+      //NOTE: Uncomment the line below to see the payload in the console
+      // console.log("Payload:", payload);
 
       res.json({ payload });
     } catch (error) {
@@ -138,11 +139,11 @@ router.post(
           start: {
             // just do start = event.start
             dateTime: start[0].dateTime,
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timeZone: start[0].timeZone,
           },
           end: {
             dateTime: end[0].dateTime,
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timeZone: end[0].timeZone,
           },
         },
       });
@@ -176,6 +177,7 @@ router.post("/chatgpt", async (req: Request, res: Response) => {
         ### Details:
         - Current date: ${new Date().toDateString()}
         - Current time: ${new Date().toLocaleTimeString()}
+        - Current timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
         - Required fields: summary, start, end.
         - Defaults:
           - If no times are provided, assume the event starts in 1 hour and lasts 30 minutes.

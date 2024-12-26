@@ -23,8 +23,11 @@ export const GoogleCalendarEvent = {
               dateTime: {
                 type: "string",
               },
+              timeZone: {
+                type: "string",
+              },
             },
-            required: ["dateTime"],
+            required: ["dateTime", "timeZone"],
             additionalProperties: false,
           },
         },
@@ -36,8 +39,11 @@ export const GoogleCalendarEvent = {
               dateTime: {
                 type: "string",
               },
+              timeZone: {
+                type: "string",
+              },
             },
-            required: ["dateTime"],
+            required: ["dateTime", "timeZone"],
             additionalProperties: false,
           },
         },
