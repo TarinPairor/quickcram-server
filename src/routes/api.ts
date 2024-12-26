@@ -35,7 +35,7 @@ router.post(
       if (!credential) {
         return res.status(400).json({ error: "Missing credential" });
       }
-      console.log("Received credential:", credential);
+      console.log("Received credential:", credential.substring(0, 6));
 
       const ticket = await oauth2Client.verifyIdToken({
         idToken: credential,
@@ -63,11 +63,11 @@ router.post(
       if (!code) {
         return res.status(400).json({ error: "Missing code" });
       }
-      console.log("Received authorization code:", code);
+      console.log("Received authorization code:", code.substring(0, 6));
 
       // Log the OAuth client configuration
       console.log("OAuth Client Config:", {
-        clientId: oauth2Client._clientId,
+        hasClientId: !!oauth2Client._clientId,
         // redirectUri: oauth2Client.redirectUri,
         hasSecret: !!oauth2Client._clientSecret,
       });
@@ -91,7 +91,7 @@ router.post(
         message: error.message,
         response: error.response?.data,
         config: {
-          clientId: !!oauth2Client._clientId,
+          hasClientId: !!oauth2Client._clientId,
           // redirectUri: oauth2Client._redirectUri,
         },
       });
