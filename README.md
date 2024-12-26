@@ -8,3 +8,7 @@ Backend endpoints for quickcram-server
 - `/api/create-tokens`: creat code for acces and refresh token
 - `/api/create-calendar-event`: call Google Calendar API
 - `/api/chatgpt`: call OPENAI API
+
+# Run locally
+
+- `vercel dev` then `vercel --prod`
